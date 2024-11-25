@@ -1,0 +1,23 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Reader",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-std=c++11",
+                "-pthread",
+                "reader.cpp",
+                "-o",
+                "reader"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Generated task by user."
+        }
+    ]
+}
