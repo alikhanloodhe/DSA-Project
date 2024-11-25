@@ -63,7 +63,7 @@ void displayForward(int userId) {
     while (current) {
         if (current->id == userId) { // Check if ride belongs to the given user ID
            // cout << "ID: " << current->id 
-            cout << " Time: " << current->time 
+            cout << "Time: " << current->time 
                  << ", Date: " << current->date 
                  << ", From: " << current->source 
                  << ", To: " << current->destination << endl;
@@ -73,7 +73,7 @@ void displayForward(int userId) {
     }
 
     if (!found) {
-        cout << "No ride history found for User ID: " << userId << endl;
+        cout << "No ride history found for this user" << endl;
     }
 }
 
@@ -91,7 +91,7 @@ void displayBackward(int userId) {
     while (current) {
         if (current->id == userId) { // Check if ride belongs to the given user ID
             //cout << "ID: " << current->id 
-            cout << ", Time: " << current->time 
+            cout << "Time: " << current->time 
                  << ", Date: " << current->date 
                  << ", From: " << current->source 
                  << ", To: " << current->destination << endl;
@@ -101,7 +101,7 @@ void displayBackward(int userId) {
     }
 
     if (!found) {
-        cout << "No ride history found for User ID: " << userId << endl;
+        cout << "No ride history found for this user  " << endl;
     }
 }
 
@@ -137,7 +137,7 @@ void displayBackward(int userId) {
             cout << "Error opening file for reading or file not found.\n";
             return;
         }
-
+        clear();
         string line;
         // Skip the header line ("Ride History:")
         getline(file, line);
@@ -158,7 +158,16 @@ void displayBackward(int userId) {
         }
 
         file.close();
-        cout << "Ride history loaded from " << filename << endl;
+        // cout << "Ride history loaded from " << filename << endl;
+    }
+    void clear() {
+    RideNode* current = head;
+    while (current) {
+        RideNode* temp = current;
+        current = current->next;
+        delete temp;
+    }
+    head = tail = nullptr;
     }
 
     // Free memory
@@ -169,28 +178,7 @@ void displayBackward(int userId) {
             current = current->next;
             delete temp;
         }
-        cout << "Ride history cleared.\n";
+        //cout << "Ride history cleared.\n";
     }
 };
 
-// int main() {
-//     RideHistory userHistory;
-
-//     // Load rides from the file
-//     userHistory.loadFromFile("RideHistory.txt");
-
-//     // Display the loaded ride history
-//     userHistory.displayForward(4);
-
-//     // Add new rides to the history
-//     //userHistory.addRide(4, "03:00 PM", "2024-11-15", "Location D", "Location E");
-//     //userHistory.addRide(5, "06:30 PM", "2024-11-20", "Location E", "Location F");
-
-//     // Display the updated ride history
-//     //userHistory.displayForward(4);
-
-//     // Save the updated ride history to a file
-//     userHistory.saveToFile("RideHistory.txt");
-
-//     return 0;
-// }

@@ -64,10 +64,10 @@ public:
         case 2: 
             // here recent ride function will be called and id will be passed to it
             
-            RH.loadFromFile("RideHistory.txt");
-            cout<<ID<<endl;
-            RH.displayBackward(ID);
+            //RH.loadFromFile("RideHistory.txt"); // This has to be called once and it is already called in the constructor
+            RH.displayForward(ID);
             RH.~RideHistory();
+            displayUserInterface(ID);
             break;
 
         case 3: // Login User

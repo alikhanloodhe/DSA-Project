@@ -58,6 +58,14 @@ public:
     void registerDriver(const string& username, const string& password, const string& license) {
         if (drivers.usernameExists(username)) {
             cout << "Username already exists. Please enter a new one.\n";
+            string username,email,password;
+            cout << "Enter username: ";
+            getline(cin, username);
+            cout << "Enter email: ";
+            getline(cin, email);
+            cout << "Enter password: ";
+            getline(cin, password);
+            registerDriver(username,password,license);
             return;
         }
         drivers.add(Driver(driverIDCounter++, username, password, license));
