@@ -30,7 +30,7 @@ public:
     RideHistory()   {
         head = nullptr;
         tail = nullptr;
-        loadFromFile("RideHistory.txt");
+        loadFromFile("Files\\RideHistory.txt");
     }
 
     // Add a new ride to the history

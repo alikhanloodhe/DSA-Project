@@ -6,7 +6,7 @@
 using namespace std;
 
 // Node Class
-template <typename T>
+template <typename T> // Template is used as it can be of any datatype
 class Node {
 public:
     T data;
@@ -37,19 +37,6 @@ public:
             temp->next = newNode;
         }
     }
-
-    // // Find a node by username
-    // T* find(const string& username) {
-    //     Node<T>* temp = head;
-    //     while (temp) {
-    //         if (temp->data.username == username) {
-    //             return &temp->data;
-    //         }
-    //         temp = temp->next;
-    //     }
-    //     return nullptr;
-    // }
-
     // Find a node by ID
     T* findByID(int id) {
         Node<T>* temp = head;

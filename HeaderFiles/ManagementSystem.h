@@ -13,7 +13,7 @@ private:
     int driverIDCounter;
 
     void loadIDCounters() {
-        ifstream inFile("ids.txt");
+        ifstream inFile("Files\\ids.txt");
         if (inFile) {
             inFile >> userIDCounter >> driverIDCounter;
         } else {
@@ -24,7 +24,7 @@ private:
     }
 
     void saveIDCounters() {
-        ofstream outFile("ids.txt");
+        ofstream outFile("Files\\ids.txt");
         outFile << userIDCounter << " " << driverIDCounter;
         outFile.close();
     }
@@ -90,35 +90,14 @@ public:
         driver->login(password);
     }
 
-
-// Login user by id
-//     void loginUser(int id, const string& password) {
-//     // User* user = users.find(username); // findByID returns a User*, not a Node<User>*
-//     User* user = users.findByID(id);
-//     if (!user) {
-//         cout << "User not found.\n";
-//         return;
-//     }
-//     user->login(password); // Call login on the User object
-// }
-
-// Login Driver by ID
-// void loginDriver(int id, const string& password) {
-//     Driver* driver = drivers.findByID(id); // findByID returns a Driver*, not a Node<Driver>*
-//     if (!driver) {
-//         cout << "Driver not found.\n";
-//         return;
-//     }
-//     driver->login(password); // Call login on the Driver object
-// }
     void saveData() {
-        users.saveToFile("users.txt");
-        drivers.saveToFile("drivers.txt");
+        users.saveToFile("Files\\users.txt");
+        drivers.saveToFile("Files\\drivers.txt");
         saveIDCounters();
     }
 
     void loadData() {
-        users.loadFromFile("users.txt");
-        drivers.loadFromFile("drivers.txt");
+        users.loadFromFile("Files\\users.txt");
+        drivers.loadFromFile("Files\\drivers.txt");
     }
 };
