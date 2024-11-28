@@ -2,19 +2,20 @@
 using namespace std;
 
 // Node structure
-struct Node {
-    int data;    // Data stored in the node
-    Node* next;  // Pointer to the next node
+struct QueueNode {
+    int data;    // Data stored in the QueueNode
+    QueueNode* next;  // Pointer to the next QueueNode
 
     // Constructor
-    Node(int value) : data(value), next(nullptr) {}
+    QueueNode(int value) : data(value), next(nullptr) {}
 };
 
 // Queue class using linked list
 class Queue {
+    friend class User;
 private:
-    Node* front; // Pointer to the front of the queue
-    Node* rear;  // Pointer to the rear of the queue
+    QueueNode* front; // Pointer to the front of the queue
+    QueueNode* rear;  // Pointer to the rear of the queue
     int size;    // Current size of the queue
 
 public:
@@ -30,18 +31,22 @@ public:
 
     // Enqueue: Add an element to the rear of the queue
     void enqueue(int value) {
-        Node* newNode = new Node(value);
+        QueueNode* newQueueNode = new QueueNode(value);
 
         if (isEmpty()) {
-            front = rear = newNode;
+            front = rear = newQueueNode;
         } else {
-            rear->next = newNode;
-            rear = newNode;
+            rear->next = newQueueNode;
+            rear = newQueueNode;
         }
         size++;
-        cout << value << " enqueued to queue.\n";
+        //cout << value << " enqueued to queue.\n";
     }
 
+
+    QueueNode* getFront() const {
+    return front;
+}
     // Dequeue: Remove an element from the front of the queue
     void dequeue() {
         if (isEmpty()) {
@@ -49,13 +54,13 @@ public:
             return;
         }
 
-        Node* temp = front;
+        QueueNode* temp = front;
         front = front->next;
         if (!front) { // If the queue is now empty
             rear = nullptr;
         }
 
-        cout << temp->data << " dequeued from queue.\n";
+       // cout << temp->data << " dequeued from queue.\n";
         delete temp;
         size--;
     }
@@ -86,7 +91,7 @@ public:
             return;
         }
 
-        Node* current = front;
+        QueueNode* current = front;
         cout << "Queue: ";
         while (current) {
             cout << current->data << " ";

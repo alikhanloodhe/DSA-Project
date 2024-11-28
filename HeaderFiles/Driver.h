@@ -118,7 +118,7 @@ class Driver {
         // Clear any existing entries for this driver before saving new availability
         clearAvailability();
 
-        std::ofstream outFile("driverAvailability.txt", std::ios::app);
+        std::ofstream outFile("Files\\driverAvailability.txt", std::ios::app);
         if (outFile.is_open()) {
             outFile << ID << "," << location << "\n";
             outFile.close();
@@ -128,8 +128,8 @@ class Driver {
     }
 
     void clearAvailability() {
-        std::ifstream inFile("driverAvailability.txt");
-        std::ofstream tempFile("temp.txt");
+        std::ifstream inFile("Files\\driverAvailability.txt");
+        std::ofstream tempFile("Files\\temp.txt");
         if (!inFile.is_open() || !tempFile.is_open()) {
             cerr << "Error handling availability file.\n";
             return;
@@ -148,8 +148,8 @@ class Driver {
         inFile.close();
         tempFile.close();
 
-        remove("driverAvailability.txt");
-        rename("temp.txt", "driverAvailability.txt");
+        remove("Files\\driverAvailability.txt");
+        rename("Files\\temp.txt", "Files\\driverAvailability.txt");
     }
     string serialize() const {
         return to_string(ID) + "," + username + "," + password + "," + licenseNumber;

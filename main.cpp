@@ -22,7 +22,12 @@ int main() {
     int choice;
     do {
         displayMenu();
-        cin >> choice;
+        if (!(cin >> choice)) {
+            cout << "Invalid input. Please enter a valid choice.\n";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue;
+     }
         cin.ignore(); // Clear the input buffer for getline
 
         string username, password, email, license;

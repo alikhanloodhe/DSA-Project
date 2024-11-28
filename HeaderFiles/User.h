@@ -1,3 +1,5 @@
+#ifndef USER_H
+#define USER_H
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -6,8 +8,8 @@
 #include <chrono>
 #include <iomanip>
 #include "rideHistory.h"
-//#include "RideRequestMatching.h"
 #include "RidePrice.h"
+#include "Queue.h"
 using namespace std;
 
 class User {
@@ -62,12 +64,6 @@ public:
         cin.ignore(); // Clear the input buffer for getline
         switch(choice) {
         case 1: 
-            // from the file and then based on an algorithm will calculate price for the ride
-            // After Giving details about a ride
-            // Here we will have a check about if the user availbility of all drivers is false
-            // We add the user id in a file and a queue will read from that file.
-            // If three or four users are in the file they will be loaded into the queue ig
-            // and then they will be served accordingly
             book_a_ride(ID);
             displayUserInterface(ID);
             break;
@@ -118,36 +114,130 @@ void book_a_ride(int ID){
     cout << "Enter your destination: ";
     getline(cin, destination);
     // Search for available drivers
+    Queue user_queue;
     int choice = 1;
     vector<int>ids;
     vector<string>driverLocations;
-    
+    loadQueue(user_queue);
     searchAvailableDrivers(ids,driverLocations);
- 
+    bool flag = false;
+    if(ids.size()==0 || !user_queue.isEmpty()){
+        addToQueue(user_queue,ID);
+        flag = true;
+    }
+    
     // Search for the drivers again and again until it finds the driver
-    while(ids.size()==0 && choice == 1){
+    while(flag || (ids.size()==0 && choice == 1 && !user_queue.isEmpty() )){
         cout<<"Ops all drivers are busy."<<endl;
-        cout<<"Press 1 to try again or 0 to exit"<<endl;
+        cout<<"Press 1 to try again or 0 to CANCEL the ride!"<<endl;
         cin>>choice;
-        searchAvailableDrivers(ids,driverLocations);
+        if(choice ==1){
+            user_queue.~Queue();
+            loadQueue(user_queue);
+            if(user_queue.peek() ==ID){
+            flag = false;
+            searchAvailableDrivers(ids,driverLocations);
+        }
+        }
+        else{
+            break;
+        }
+        
+        
     }
     if(choice == 0){
+        removeFromQueue(user_queue,ID);
         return;
     }
-    string nearest_driver;
-    RRM.hanldeRide(userLocation, destination, driverLocations,nearest_driver);
+    removeFromQueue(user_queue,ID);
+    string selected_driver;
+    RRM.hanldeRide(userLocation, destination, driverLocations,selected_driver);
     // Now we will have to find the id of nearest driver
-    int current_id = findId(ids,driverLocations,nearest_driver);
-    clearAvailability(current_id);
-    // Clear the availability of the driver selected
+    int current_id = findId(ids,driverLocations,selected_driver);
+    clearAvailability(current_id); // Clear the availability of the driver selected
+    
     // Calculate the price of the ride
     RidePrice RP;
     string time = get_current_time();
     int price = RP.dynamicRidePrice(userLocation, destination, time, driverLocations.size());
     cout<<"The price of the ride is: "<<price<<endl;
     SaveRideHistory(userLocation, destination);   // Add the ride to Ride History
-    displayUserInterface(ID);
+    
 }
+//-------------------------------------Ride Request Queue Implementation--------------------------------------------
+    void addToQueue(Queue& userQueue, int userID) {
+        userQueue.enqueue(userID);
+
+        // Save to file
+        ofstream outFile("Files\\userQueue.txt", ios::app);
+        if (outFile.is_open()) {
+            outFile << userID << "\n";
+            outFile.close();
+           // cout << "User ID " << userID << " added to the file-based queue.\n";
+        } else {
+            cerr << "Unable to open userQueue.txt for writing.\n";
+        }
+    }
+    void removeFromQueue(Queue& userQueue, int userID) {
+        // Temporary queue for processing
+        Queue tempQueue;
+
+        // Process queue and rebuild it
+        while (!userQueue.isEmpty()) {
+            int currentID = userQueue.peek();
+            userQueue.dequeue();
+
+            if (currentID != userID) {
+                tempQueue.enqueue(currentID);
+            }
+        }
+
+        // Swap contents back to original queue
+        while (!tempQueue.isEmpty()) {
+            userQueue.enqueue(tempQueue.peek());
+            tempQueue.dequeue();
+        }
+
+        // Update file
+        updateQueueFile(userQueue);
+    }
+
+    // Load queue from file
+    void loadQueue(Queue& userQueue) {
+        std::ifstream inFile("Files\\userQueue.txt");
+        if (!inFile.is_open()) {
+            cerr << "Unable to open userQueue.txt for reading.\n";
+            return;
+        }
+
+        string line;
+        while (getline(inFile, line)) {
+            if (!line.empty() && all_of(line.begin(), line.end(), ::isdigit)) {
+                userQueue.enqueue(stoi(line));
+            }
+        }
+
+        inFile.close();
+    }
+
+    // Update queue file
+    void updateQueueFile(const Queue& userQueue) {
+    std::ofstream outFile("Files\\userQueue.txt", std::ios::trunc);
+    if (!outFile.is_open()) {
+        cerr << "Unable to open userQueue.txt for writing.\n";
+        return;
+    }
+    
+    // Use the front pointer of the queue
+    QueueNode* current = userQueue.front; // Ensure access via friend, getter, or public
+    while (current) {
+        outFile << current->data << "\n";
+        current = current->next;
+    }
+
+    outFile.close();
+}
+
 
 int findId(vector<int> ids,vector<string>driverLocations, string driver){
     int index = 0;
@@ -160,8 +250,8 @@ int findId(vector<int> ids,vector<string>driverLocations, string driver){
     return ids[index];
 }
 void clearAvailability(int id) {
-        std::ifstream inFile("driverAvailability.txt");
-        std::ofstream tempFile("temp.txt");
+        ifstream inFile("Files\\driverAvailability.txt");
+        ofstream tempFile("Files\\temp.txt");
         if (!inFile.is_open() || !tempFile.is_open()) {
             cerr << "Error handling availability file.\n";
             return;
@@ -180,8 +270,8 @@ void clearAvailability(int id) {
         inFile.close();
         tempFile.close();
 
-        remove("driverAvailability.txt");
-        rename("temp.txt", "driverAvailability.txt");
+        remove("Files\\driverAvailability.txt");
+        rename("Files\\temp.txt", "Files\\driverAvailability.txt");
     }
 void SaveRideHistory(string userLocation,string destination){
     RideHistory RH;
@@ -192,7 +282,7 @@ void SaveRideHistory(string userLocation,string destination){
     RH.~RideHistory();
 }
 static void searchAvailableDrivers(vector<int>& ids, vector<string>& locations) {
-        std::ifstream inFile("driverAvailability.txt");
+        std::ifstream inFile("Files\\driverAvailability.txt");
         if (!inFile.is_open()) {
             cerr << "Error opening driver availability file.\n";
             return;
@@ -238,3 +328,4 @@ string get_current_date() {
     return oss.str();
 }
 };
+#endif

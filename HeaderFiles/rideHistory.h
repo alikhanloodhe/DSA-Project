@@ -45,8 +45,6 @@ public:
             newRide->prev = tail;
             tail = newRide;
         }
-        //cout << "Ride added: ID=" << id << ", Time=" << time << ", Date=" << date 
-        //     << ", From=" << source << ", To=" << destination << endl;
     }
 
     // Updated displayForward to filter by user ID
@@ -126,7 +124,6 @@ void displayBackward(int userId) {
         }
 
         file.close();
-        cout << "Ride history saved to " << filename << endl;
     }
 
     // Load ride history from a file
