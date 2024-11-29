@@ -63,7 +63,7 @@ public:
         return {distances[end], path};
     }
 
-    void handleRide(const string& userLocation, const string& destination, const vector<string>& driverLocations,string & nearest_Driver) {
+    void handleRide(const string& userLocation, const string& destination, const vector<string>& driverLocations, string & nearest_Driver, int numStops, vector <string> stops) {
         // Step 1: Find the nearest driver
         string nearestDriver;
         int minDistance = INT_MAX;
@@ -85,7 +85,7 @@ public:
             cout << "No driver available to reach " << userLocation << "." << endl;
             return;
         }
-        nearest_Driver = nearestDriver;
+
         // Step 2: Bring the driver to the user's location
         cout << "Nearest driver is at " << nearestDriver << " and will take " << minDistance << " meters to reach " << userLocation << "." << endl;
         cout << "Driver's path to user: ";
@@ -95,22 +95,32 @@ public:
         }
         cout << endl;
 
-        // Step 3: Find the shortest path to the destination
-        pair<int, vector<string>> destinationResult = calculateShortestPath(userLocation, destination);
-        int userToDestinationDistance = destinationResult.first;
-        vector<string> userToDestinationPath = destinationResult.second;
+        // Step 3: Handle multistop journey
 
-        if (userToDestinationDistance == INT_MAX) {
-            cout << "No path exists from " << userLocation << " to " << destination << "." << endl;
-            return;
+        int totalDistance = 0;
+        string currentLocation = userLocation;
+
+        for (int i = 0; i <= numStops; ++i) {
+            string nextLocation = (i < numStops) ? stops[i] : destination;
+            pair<int, vector<string>> result = calculateShortestPath(currentLocation, nextLocation);
+
+            if (result.first == INT_MAX) {
+                cout << "No valid path exists from " << currentLocation << " to " << nextLocation << "." << endl;
+                return;
+            }
+
+            totalDistance += result.first;
+
+            cout << "Path from " << currentLocation << " to " << nextLocation << ": ";
+            for (size_t j = 0; j < result.second.size(); ++j) {
+                cout << result.second[j];
+                if (j < result.second.size() - 1) cout << " -> ";
+            }
+            cout << " (" << result.first << " meters)\n";
+
+            currentLocation = nextLocation;
         }
 
-        cout << "Shortest distance from " << userLocation << " to " << destination << " is " << userToDestinationDistance << " meters." << endl;
-        cout << "Path: ";
-        for (size_t i = 0; i < userToDestinationPath.size(); ++i) {
-            cout << userToDestinationPath[i];
-            if (i < userToDestinationPath.size() - 1) cout << " -> ";
-        }
-        cout << endl;
+        cout << "\nTotal distance for the journey is " << totalDistance << " meters.\n";
     }
 };

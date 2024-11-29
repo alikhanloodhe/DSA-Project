@@ -111,8 +111,8 @@ class RideRequestMatching {
     }
     cout<<endl;
     }
-    void hanldeRide(string userLocation, string destination, vector<string> driverLocations,string & nearest_driver){
+    void hanldeRide(string userLocation, string destination, vector<string> driverLocations,string & nearest_driver, int numStops, vector <string> stops){
         Graph nustMap = getNustMap();
-        nustMap.handleRide(userLocation, destination, driverLocations,nearest_driver);
+        nustMap.handleRide(userLocation, destination, driverLocations,nearest_driver, numStops, stops);
     }
 };

@@ -113,6 +113,16 @@ void book_a_ride(int ID){
     getline(cin, userLocation);
     cout << "Enter your destination: ";
     getline(cin, destination);
+    cout << "\nHow many stops do you want to take? ";
+        int NumStops;
+        cin >> NumStops;
+        cin.ignore();
+        cout << endl;
+        vector<string> stops(NumStops);
+        for (int i = 0; i < NumStops; ++i) {
+            cout << "Enter stop " << i + 1 << ": ";
+            getline(cin, stops[i]);
+        }
     // Search for available drivers
     Queue user_queue;
     int choice = 1;
@@ -151,7 +161,7 @@ void book_a_ride(int ID){
     }
     removeFromQueue(user_queue,ID);
     string selected_driver;
-    RRM.hanldeRide(userLocation, destination, driverLocations,selected_driver);
+    RRM.hanldeRide(userLocation, destination, driverLocations,selected_driver,NumStops,stops);
     // Now we will have to find the id of nearest driver
     int current_id = findId(ids,driverLocations,selected_driver);
     clearAvailability(current_id); // Clear the availability of the driver selected
