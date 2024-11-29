@@ -116,18 +116,3 @@ class RideRequestMatching {
         nustMap.handleRide(userLocation, destination, driverLocations,nearest_driver);
     }
 };
-// int main() {
-    
-//     Graph nustMap = getNustMap();
-//     //all locations of the map:
-//     vector<string> locations = get_All_Locations();
-//     // Driver locations
-//     vector<string> driverLocations = {"Gate 1", "NSTP", "Residential Area"};
-//     print_all_loc();
-   
-
-//     // Handle the ride
-//     nustMap.handleRide(userLocation, destination, driverLocations);
-
-//     return 0;
-// }
