@@ -169,8 +169,9 @@ void book_a_ride(int ID){
     // Calculate the price of the ride
     RidePrice RP;
     string time = get_current_time();
-    int price = RP.dynamicRidePrice(userLocation, destination, time, driverLocations.size());
-    cout<<"The price of the ride is: "<<price<<endl;
+    int price = RP.dynamicRidePrice(totalDistance, time, driverLocations.size());
+    cout << "The total price for your ride is: " << price << endl;
+    
     SaveRideHistory(userLocation, destination);   // Add the ride to Ride History
     
 }
@@ -282,7 +283,7 @@ void clearAvailability(int id) {
 
         remove("Files\\driverAvailability.txt");
         rename("Files\\temp.txt", "Files\\driverAvailability.txt");
-    }
+}
 void SaveRideHistory(string userLocation,string destination){
     RideHistory RH;
     string time = get_current_time();

@@ -6,7 +6,7 @@
 #include <climits>
 #include <algorithm> // Required for reverse
 using namespace std;
-
+int totalDistance = 0;
 class Graph {
 private:
     map<string, vector<pair<string, int>>> adjList;
@@ -97,7 +97,7 @@ public:
 
         // Step 3: Handle multistop journey
 
-        int totalDistance = 0;
+        
         string currentLocation = userLocation;
 
         for (int i = 0; i <= numStops; ++i) {
@@ -120,7 +120,6 @@ public:
 
             currentLocation = nextLocation;
         }
-
         cout << "\nTotal distance for the journey is " << totalDistance << " meters.\n";
     }
 };
