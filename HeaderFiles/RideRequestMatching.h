@@ -22,7 +22,6 @@ class RideRequestMatching {
     nustMap.addEdge("JOHAR HOSTELS", "NSTP", 700);
     nustMap.addEdge("GATE 10", "NSTP", 750);
     nustMap.addEdge("JOHAR HOSTELS", "GYM", 290);
-
     nustMap.addEdge("JOHAR HOSTELS", "SCME", 650);
     nustMap.addEdge("SCME", "C1", 270);
     nustMap.addEdge("C1", "IESE", 160);
@@ -111,8 +110,8 @@ class RideRequestMatching {
     }
     cout<<endl;
     }
-    void hanldeRide(string userLocation, string destination, vector<string> driverLocations,string & nearest_driver, int NumStops, vector <string> stops){
+    void hanldeRide(string userLocation, string destination, vector<string> driverLocations,string & selected_driver,int numStops, vector <string> stops){
         Graph nustMap = getNustMap();
-        nustMap.handleRide(userLocation, destination, driverLocations,nearest_driver,NumStops,stops);
+        nustMap.handleRide(userLocation, destination, driverLocations,selected_driver,numStops,stops);
     }
 };

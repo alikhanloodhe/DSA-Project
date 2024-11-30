@@ -14,7 +14,6 @@ void displayMenu() {
     cout << "5. Exit\n";
     cout << "Enter your choice: ";
 }
-
 int main() {
     ManagementSystem system;
     system.loadData(); // Load existing data from files

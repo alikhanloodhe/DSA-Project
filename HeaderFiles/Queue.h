@@ -12,7 +12,7 @@ struct QueueNode {
 
 // Queue class using linked list
 class Queue {
-    friend class User;
+    // friend class User; user can access priv members as well
 private:
     QueueNode* front; // Pointer to the front of the queue
     QueueNode* rear;  // Pointer to the rear of the queue
@@ -44,7 +44,7 @@ public:
     }
 
 
-    QueueNode* getFront() const {
+    QueueNode* getFront() const { // Getter Method for private member
     return front;
 }
     // Dequeue: Remove an element from the front of the queue

@@ -2,7 +2,10 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <vector>
 #include<algorithm>
+#include "DriverRating.h"
+
 using namespace std;
 
 class Driver {
@@ -13,6 +16,7 @@ class Driver {
     string licenseNumber;
     string location;
     bool isAvailable;
+    
 
     Driver() : ID(-1), username(""), password(""), licenseNumber(""), isAvailable(false), location("") {}
     Driver(int id, string uname, string pwd, string license)
@@ -40,7 +44,8 @@ class Driver {
         cout << "\n--- Driver Interface Menu ---\n";
         cout << "1. Set your location\n";
         cout << "2. Set Availability\n";
-        cout << "3. Exit\n";
+        cout << "3. View Rating\n";
+        cout << "4. Exit\n";
         cout << "Enter your choice: ";
     }
 
@@ -63,6 +68,9 @@ class Driver {
                 break;
 
             case 3:
+                showRating(ID);
+                break;
+            case 4:
                 cout << "Exiting Driver Interface...\n";
                 clearAvailability(); // Clear availability before exiting
                 return;
@@ -94,6 +102,10 @@ class Driver {
     }
 
     void setAvailability() {
+        if (location.empty()) {
+        cout << "You must set your location before setting availability.\n";
+        return;
+    }
         cout << "Set Availability\n";
         cout << "1. Available\n";
         cout << "2. Not Available\n";
@@ -112,6 +124,11 @@ class Driver {
         } else {
             cout << "Invalid choice. Please try again.\n";
         }
+    }
+
+    void showRating(int driverID) {
+        DriverRating DR;
+        DR.ShowDriverRating(driverID);
     }
 
     void saveAvailability() {
@@ -173,5 +190,7 @@ class Driver {
     getline(ss, availabilityStr);
 
     isAvailable = (availabilityStr == "1"); // Assume 1 means available
-}
+    }
+
+
 };

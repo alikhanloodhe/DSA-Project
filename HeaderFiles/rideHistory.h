@@ -56,11 +56,8 @@ void displayForward(int userId) {
 
     RideNode* current = head;
     bool found = false;
-
-    //cout << "Ride History for User ID: " << userId << " (Forward):\n";
     while (current) {
         if (current->id == userId) { // Check if ride belongs to the given user ID
-           // cout << "ID: " << current->id 
             cout << "Time: " << current->time 
                  << ", Date: " << current->date 
                  << ", From: " << current->source 
@@ -101,6 +98,31 @@ void displayBackward(int userId) {
     if (!found) {
         cout << "No ride history found for this user  " << endl;
     }
+}
+    int getRidesCountForToday(int userId) {
+    int count = 0;
+   
+    
+    string currentDate = getCurrentDate(); // Get today's date
+    
+    RideNode* current = head;
+    while (current) {
+        if (current->id == userId && current->date == currentDate) {
+            count++;
+        }
+        current = current->next;
+    }
+    
+    return count;
+}
+
+// Helper function to get today's date (formatted as YYYY-MM-DD)
+string getCurrentDate() {
+    time_t now = time(0);
+    tm* localtm = localtime(&now);
+    char dateStr[80];
+    strftime(dateStr, sizeof(dateStr), "%Y-%m-%d", localtm);
+    return string(dateStr);
 }
 
     // Save ride history to a file

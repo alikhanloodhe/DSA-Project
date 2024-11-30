@@ -6,7 +6,7 @@
 #include <climits>
 #include <algorithm> // Required for reverse
 using namespace std;
-int totalDistance = 0;
+
 class Graph {
 private:
     map<string, vector<pair<string, int>>> adjList;
@@ -63,7 +63,7 @@ public:
         return {distances[end], path};
     }
 
-    void handleRide(const string& userLocation, const string& destination, const vector<string>& driverLocations, string & nearest_Driver, int numStops, vector <string> stops) {
+    void handleRide(const string& userLocation, const string& destination, const vector<string>& driverLocations, string & selected_Driver, int numStops, vector <string> stops) {
         // Step 1: Find the nearest driver
         string nearestDriver;
         int minDistance = INT_MAX;
@@ -85,7 +85,7 @@ public:
             cout << "No driver available to reach " << userLocation << "." << endl;
             return;
         }
-
+        selected_Driver = nearestDriver;
         // Step 2: Bring the driver to the user's location
         cout << "Nearest driver is at " << nearestDriver << " and will take " << minDistance << " meters to reach " << userLocation << "." << endl;
         cout << "Driver's path to user: ";
@@ -97,7 +97,7 @@ public:
 
         // Step 3: Handle multistop journey
 
-        
+        int totalDistance = 0;
         string currentLocation = userLocation;
 
         for (int i = 0; i <= numStops; ++i) {
@@ -120,6 +120,25 @@ public:
 
             currentLocation = nextLocation;
         }
+
         cout << "\nTotal distance for the journey is " << totalDistance << " meters.\n";
+    }
+    int get_total_Distance_with_Stops(const string& userLocation, const string& destination,vector <string> stops){
+        int totalDistance = 0;
+        string currentLocation = userLocation;
+
+        for (int i = 0; i <= stops.size(); ++i) {
+            string nextLocation = (i < stops.size()) ? stops[i] : destination;
+            pair<int, vector<string>> result = calculateShortestPath(currentLocation, nextLocation);
+
+            if (result.first == INT_MAX) {
+                cout << "No valid path exists from " << currentLocation << " to " << nextLocation << "." << endl;
+                return 0;
+            }
+
+            totalDistance += result.first;
+             currentLocation = nextLocation;
+    }
+        return totalDistance;
     }
 };
