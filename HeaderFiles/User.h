@@ -7,6 +7,8 @@
 #include<algorithm>
 #include <chrono>
 #include <iomanip>
+#include<windows.h>
+#include<conio.h>
 #include "DynamicRidePrice.h"
 #include "RideRequestQueue.h"
 #include "InAppPoint.h"
@@ -107,82 +109,115 @@ public:
         getline(ss, password, ',');
         getline(ss, email);
     }
-    
-void book_a_ride(int ID){
+
+//--------------------------------------BOOK A RIDE-----------------------------------------
+void book_a_ride(int user_id){
     RideRequestMatching RRM;
     RRM.print_all_loc();
     string userLocation, destination;
-    cout << "Enter your current location: ";
-    getline(cin, userLocation);
-    cout << "Enter your destination: ";
-    getline(cin, destination);
-    cout << "\nHow many stops do you want to take? ";
-        int NumStops;
-        cin >> NumStops;
-        cin.ignore();
-        cout << endl;
-        vector<string> stops(NumStops);
-        for (int i = 0; i < NumStops; ++i) {
-            cout << "Enter stop " << i + 1 << ": ";
-            getline(cin, stops[i]);
-        }
+    int NumStops=0;
+    vector<string> stops(NumStops);
+    get_ride_details(userLocation, destination, NumStops, &stops); // assing the values to the variables
     // Search for available drivers
     RideRequestQueue RRQ;
     Queue user_queue;
     int choice = 1;
-    vector<int>ids;
+    vector<int>driver_ids;
     vector<string>driverLocations;
     RRQ.loadQueue(user_queue);
-    searchAvailableDrivers(ids,driverLocations);
+    searchAvailableDrivers(driver_ids,driverLocations);
     bool flag = false;
-    if(ids.size()==0 || !user_queue.isEmpty()){
-        RRQ.addToQueue(user_queue,ID);
+    auto duration = chrono::seconds(15);
+    // If no drivers are available or user queue is not empty(some users are waiting in the queue), add user to the queue
+    if(driver_ids.size()==0 || !user_queue.isEmpty()){
+        RRQ.addToQueue(user_queue,user_id);
         flag = true;
     }
     
     // Search for the drivers again and again until it finds the driver
-    while(flag || (ids.size()==0 && choice == 1 && !user_queue.isEmpty() )){
+    while(flag || (driver_ids.size()==0 && choice == 1 && !user_queue.isEmpty() )){
         cout<<"Ops all drivers are busy."<<endl;
         cout<<"Press 1 to try again or 0 to CANCEL the ride!"<<endl;
-        cin>>choice;
+        auto start = chrono::steady_clock::now();
+        bool timed_out = false;
+
+        while (true) {
+            auto now = chrono::steady_clock::now();
+
+            // Check if 2 minutes have passed
+            if (now - start >= chrono::seconds(30)) {
+                cout << "\nRide Timeout :(\nKindly Book your ride again\n";
+                choice = 0;
+                timed_out = true;
+                break;
+            }
+
+            // Check for user input using _kbhit() and _getch() (non-blocking input)
+            if (_kbhit()) {
+                char input = _getch(); // Read the character without waiting for Enter
+                if (input == '1') {
+                    choice = 1;
+                } else if (input == '0') {
+                    choice = 0;
+                } else {
+                    cout << "Invalid input. Try again!" << endl;
+                    continue;
+                }
+                break;
+            }
+
+            Sleep(1000); // Sleep for 1 second
+        }
+
+        if (timed_out || choice == 0) {
+            break; // Exit loop if timeout occurs or user cancels the ride
+        }
+
         if(choice ==1){
             user_queue.~Queue();
             RRQ.loadQueue(user_queue);
-            if(user_queue.peek() ==ID){
+            if(user_queue.peek() ==user_id){
             flag = false;
-            searchAvailableDrivers(ids,driverLocations);
+            searchAvailableDrivers(driver_ids,driverLocations);
         }
         }
         else{ break; }
     }
     if(choice == 0){
-        RRQ.removeFromQueue(user_queue,ID);
+        // If user cancels ride on its own will
+        RRQ.removeFromQueue(user_queue,user_id);
         return;
     }
-    RRQ.removeFromQueue(user_queue,ID);
+    // Removing the user from the quue
+    RRQ.removeFromQueue(user_queue,user_id);
     string selected_driver;
-    RRM.hanldeRide(userLocation, destination, driverLocations,selected_driver,NumStops,stops);
+    // Passing the user location, destination, driver locations, selected driver, number of stops and stops to handle ride function 
+    RRM.hanldeRide(userLocation, destination,driver_ids, driverLocations,selected_driver,NumStops,stops); // This particular function will be modified here to handle ride
     
-    int current_id = find_Driver_Id(ids,driverLocations,selected_driver); // Now we will have to find the id of nearest driver
-    clearAvailability(current_id); // Clear the availability of the driver selected
+    int current_id = find_Driver_Id(driver_ids,driverLocations,selected_driver); // Now we will have to find the id of nearest driver
+    clearAvail_curr_driver(current_id); // Clear the availability of the driver selected
+    
     Time t;
-    // Calculate the price of the ride
     DynamicRidePrice DRP;
     string time = t.get_current_time();
     t.~Time();
-    int price = DRP.getdynamicRidePrice(userLocation, destination, time, driverLocations.size(),stops);
-    cout<<"The price of the ride is: "<<price<<endl;
-    DriverRating DRs;
-    DRs.UserRating(current_id);
+    int ride_price = DRP.getdynamicRidePrice(userLocation, destination, time, driver_ids.size(),stops);
+    cout<<"The price of the ride is: "<<ride_price<<endl;
+    rate_driver(current_id);
     SaveRideHistory(userLocation, destination);   // Add the ride to Ride History
+    in_AppCheckout(user_id,ride_price);
+}
+
+void in_AppCheckout(int userID,int ride_price){
     InAppPoint AP;
-    int currentPoints = AP.getCurrentpoints(ID);
-    if(currentPoints>20){
-        cout << "Would you like to pay through your In Wallet Points: \n1. Yes \n 2.No" << endl;
+    int currentPoints = AP.getCurrentpoints(userID);
+
+    if(currentPoints>100){
+        cout << "Would you like to pay through your In Wallet Points: \n1. Yes \n2. No" << endl;
         int ch;
         cin >> ch;
     if(ch == 1){
-        AP.checkOutUsingPoints(ID,price);
+        AP.checkOutUsingPoints(userID,ride_price);
     }
     else{
         return;
@@ -190,6 +225,29 @@ void book_a_ride(int ID){
     }
 
 }
+
+// rating the driver
+void rate_driver(int driver_id){
+    DriverRating DRs;
+    DRs.UserRating(driver_id);
+}
+//--------------------------------------GET RIDE DETAILS-----------------------------------------
+void get_ride_details(string & userLocation, string &destination, int &NumStops, vector<string> * stops) {
+    cout << "Enter your current location: ";
+    getline(cin, userLocation);
+    cout << "Enter your destination: ";
+    getline(cin, destination);
+    cout << "\nHow many stops do you want to take? ";
+    cin >> NumStops;
+    cin.ignore(); // Clear the input buffer for getline
+   stops->resize(NumStops); // Resize the vector
+    for (int i = 0; i < NumStops; ++i) {
+        cout << "Enter stop " << i + 1 << ": ";
+        getline(cin, (*stops)[i]); // Use pointer dereferencing to access the vector
+    }
+}
+
+// finding id of the driver selected
 int find_Driver_Id(vector<int> ids,vector<string>driverLocations, string driver){
     int index = 0;
     for(int i = 0;i<driverLocations.size();i++){
@@ -200,7 +258,9 @@ int find_Driver_Id(vector<int> ids,vector<string>driverLocations, string driver)
     }
     return ids[index];
 }
-void clearAvailability(int id) {
+
+// clear the availability of the driver assigned clearAvail_curr_driver
+void clearAvail_curr_driver(int id) {
         ifstream inFile("Files\\driverAvailability.txt");
         ofstream tempFile("Files\\temp.txt");
         if (!inFile.is_open() || !tempFile.is_open()) {
@@ -224,6 +284,8 @@ void clearAvailability(int id) {
         remove("Files\\driverAvailability.txt");
         rename("Files\\temp.txt", "Files\\driverAvailability.txt");
     }
+
+// Function to save ride history in a file
 void SaveRideHistory(string userLocation,string destination){
     Time t;
     RideHistory RH;
@@ -237,6 +299,7 @@ void SaveRideHistory(string userLocation,string destination){
     points.~InAppPoint();
     RH.~RideHistory();
 }
+
 static void searchAvailableDrivers(vector<int>& ids, vector<string>& locations) {
         std::ifstream inFile("Files\\driverAvailability.txt");
         if (!inFile.is_open()) {

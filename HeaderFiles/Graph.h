@@ -63,39 +63,64 @@ public:
         return {distances[end], path};
     }
 
-    void handleRide(const string& userLocation, const string& destination, const vector<string>& driverLocations, string & selected_Driver, int numStops, vector <string> stops) {
+    void handleRide(const string& userLocation, const string& destination,const vector<int>& driver_ids, const vector<string>& driverLocations, string & selected_Driver, int numStops, vector <string> stops) {
         // Step 1: Find the nearest driver
-        string nearestDriver;
-        int minDistance = INT_MAX;
-        vector<string> driverToUserPath;
 
-        for (const auto& driver : driverLocations) {
+        // In this particular function we will give the user the leverage to select the driver of his own choice
+        int choice_pick;
+        cout<<"Would you like to select the driver of your own choice: \n1. Yes \n2. No"<<endl;
+        cin>>choice_pick;
+        // show drivers based on 
+        vector<string> names;
+        string temp_name;
+        double temp_rating;
+        vector<double> ratings;
+        if(choice_pick == 1){
+            cout<<"Available drivers are at: "<<endl;
+            for(int i = 0;i<driver_ids.size();i++){
+                get_driver_nR(driver_ids[i],temp_name,temp_rating);
+                names.push_back(temp_name);
+                ratings.push_back(temp_rating);
+                
+            }
+            for(int i = 0;i<names.size();i++){
+                cout<<i+1<<". "<<names[i]<<" at "<<driverLocations[i]<<" with ratings "<<ratings[i]<<endl;
+            }
+            int choice;
+            cout<<"Which driver you want to select!!"<<endl;
+            cin>>choice;
+            cin.ignore();
+            vector<string> driverToUserPath;
+            selected_Driver = driverLocations[choice-1];
+            pair<int, vector<string>> result = calculateShortestPath(driverLocations[choice-1], userLocation);
+            int distance = result.first;
+            cout <<  "The Driver" << " and will take " << distance << " meters to reach " << userLocation << "." << endl;
+            driverToUserPath = result.second;
+            print_driver_path(driverToUserPath);
+        }
+        else{
+            string nearestDriver;
+            int minDistance = INT_MAX;
+            vector<string> driverToUserPath;
+        // this logic actually finds the nearest driver from all the available drivers and give its distance
+            for (const auto& driver : driverLocations) {
             pair<int, vector<string>> result = calculateShortestPath(driver, userLocation);
             int distance = result.first;
             vector<string> path = result.second;
-
-            if (distance < minDistance) {
-                minDistance = distance;
-                nearestDriver = driver;
-                driverToUserPath = path;
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearestDriver = driver;
+                    driverToUserPath = path;
+                }
             }
-        }
-
-        if (minDistance == INT_MAX) {
+        if(minDistance == INT_MAX) {
             cout << "No driver available to reach " << userLocation << "." << endl;
             return;
         }
         selected_Driver = nearestDriver;
-        // Step 2: Bring the driver to the user's location
         cout << "Nearest driver is at " << nearestDriver << " and will take " << minDistance << " meters to reach " << userLocation << "." << endl;
-        cout << "Driver's path to user: ";
-        for (size_t i = 0; i < driverToUserPath.size(); ++i) {
-            cout << driverToUserPath[i];
-            if (i < driverToUserPath.size() - 1) cout << " -> ";
+        print_driver_path(driverToUserPath);
         }
-        cout << endl;
-
-        // Step 3: Handle multistop journey
 
         int totalDistance = 0;
         string currentLocation = userLocation;
@@ -115,6 +140,7 @@ public:
             for (size_t j = 0; j < result.second.size(); ++j) {
                 cout << result.second[j];
                 if (j < result.second.size() - 1) cout << " -> ";
+                Sleep(1000);
             }
             cout << " (" << result.first << " meters)\n";
 
@@ -122,7 +148,21 @@ public:
         }
 
         cout << "\nTotal distance for the journey is " << totalDistance << " meters.\n";
+
     }
+
+    void print_driver_path(vector<string> driverToUserPath){
+        cout << "Driver's path to user: ";
+        for (size_t i = 0; i < driverToUserPath.size(); ++i) {
+            cout << driverToUserPath[i];
+            if (i < driverToUserPath.size() - 1) cout << " -> ";
+            Sleep(1000);
+        }
+        cout << endl;
+    }
+    
+    
+
     int get_total_Distance_with_Stops(const string& userLocation, const string& destination,vector <string> stops){
         int totalDistance = 0;
         string currentLocation = userLocation;
@@ -141,4 +181,63 @@ public:
     }
         return totalDistance;
     }
+    void get_driver_nR(int ID,string &name,double &rating){
+        ifstream driver_info_file("Files\\drivers.txt");
+        if (!driver_info_file.is_open()) {
+            cerr << "Error opening driver infromation file.\n";
+            return;
+        }
+        string line;
+        while (getline(driver_info_file, line)) {
+        stringstream ss(line);
+        string idStr, Name;
+        getline(ss, idStr, ',');
+        getline(ss, Name, ',');
+        Name.erase(Name.find_last_not_of(" \t\n\r\f\v") + 1);// Trim whitespace from Name (to ensure clean data)
+        try {
+            if (!idStr.empty() && stoi(idStr) == ID) {  // Trim whitespace from Name (optional, to ensure clean data)
+                name = Name; // Assign the matching name
+                break;       // Exit loop once found
+            }
+        } catch (invalid_argument &e) {
+            cerr << "Invalid ID in file: " << idStr << endl;
+        } catch (out_of_range &e) {
+            cerr << "ID out of range in file: " << idStr << endl;
+        }
+    }
+
+    driver_info_file.close();
+
+        // Now using rating
+        ifstream ratingFile("Files\\DriverRating.txt");
+        if (!ratingFile.is_open()) {
+            cerr << "Error: Could not open DriverRating.txt for reading." << endl;
+            return;
+        }
+
+        string line2;
+        vector<int> ratings;
+        while (getline(ratingFile, line2)) {
+            stringstream ss(line2);
+            string idStr, ratingStr;
+            getline(ss, idStr, ':');  // Split the line into driverID and rating
+            getline(ss, ratingStr);
+
+            if (stoi(idStr) == ID) {  // Check if the driver ID matches
+                ratings.push_back(stoi(ratingStr));  // Store the rating in the vector
+            }
+        }
+        ratingFile.close();
+        if (ratings.empty()) {
+            rating = 0;
+        } else {
+            double avgRating = 0;
+            for (int r : ratings) {
+                avgRating += r;  // Calculate the average rating
+            }
+            avgRating /= ratings.size();
+            rating = avgRating;
+        } 
+    }
+
 };

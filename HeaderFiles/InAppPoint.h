@@ -110,7 +110,7 @@ public:
         int rideCount = rh.getRidesCountForToday(userID);
 
         if (rideCount <= 1) {
-            cout << "User ID " << userID << " has not completed enough rides today to earn points." << endl;
+            //cout << "User ID " << userID << " has not completed enough rides today to earn points." << endl;
             return;
         }
 
@@ -151,15 +151,17 @@ public:
             if (current->userID == userID) {
                 int pointsAvailable = current->points;
                 if(pointsAvailable<pointsToRedeem){
-                    cout<<"Sorry Dear User!!\nYou don't have enough points.\nTake Rides daily to get maximum points"<<endl;
+                    cout<<"Sorry Dear User!!\nYou don't have enough points to redeem.\nTake Rides daily to get maximum points"<<endl;
+                    return;
                 }
-                else if (pointsAvailable >= pointsToRedeem) {
+                else if (pointsAvailable >= pointsToRedeem && pointsToRedeem>ridePrice) {
                     pointsAvailable -= pointsToRedeem;
                     updatePointsInFile(userID, pointsAvailable);
                     cout << "Ride fully paid using points. Remaining points: " << pointsAvailable << endl;
                 } else {
+                    pointsAvailable -= pointsToRedeem;
                     int remainingAmount = ridePrice - pointsToRedeem;
-                    updatePointsInFile(userID, 0);
+                    updatePointsInFile(userID, pointsAvailable);
                     cout << "Points used: " << pointsAvailable << ". Remaining to pay: " << remainingAmount << endl;
                 }
                 return;

@@ -45,6 +45,10 @@
         "streambuf": "cpp",
         "thread": "cpp",
         "typeinfo": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "future": "cpp",
+        "condition_variable": "cpp",
+        "map": "cpp",
+        "mutex": "cpp"
     }
 }
