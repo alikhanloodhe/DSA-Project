@@ -61,10 +61,11 @@ public:
         cout << "Enter your choice: ";
     }
     void displayUserInterface(int id ){ // It would be great if a user object is passed over here
-        RideHistory RH;
-        InAppPoint AP;
+        
         int choice;
         do{
+        RideHistory RH;
+        InAppPoint AP;
         displayMenu();
         if (!(cin >> choice)) {
             cout << "Invalid input. Please enter a valid choice.\n";
@@ -84,6 +85,7 @@ public:
             break;
         case 3: 
             RH.displayForward(ID);
+            RH.~RideHistory();
             break;
         case 4:
              cout << "Exiting User Interface...\n";
@@ -114,10 +116,11 @@ public:
 void book_a_ride(int user_id){
     RideRequestMatching RRM;
     RRM.print_all_loc();
+    vector<string> maplocations = RRM.get_All_Locations();
     string userLocation, destination;
     int NumStops=0;
     vector<string> stops(NumStops);
-    get_ride_details(userLocation, destination, NumStops, &stops); // assing the values to the variables
+    get_ride_details(userLocation, destination, NumStops, &stops, maplocations); // assing the values to the variables
     // Search for available drivers
     RideRequestQueue RRQ;
     Queue user_queue;
@@ -166,7 +169,7 @@ void book_a_ride(int user_id){
                 break;
             }
 
-            Sleep(1000); // Sleep for 1 second
+            Sleep(100); // Sleep for 1 second
         }
 
         if (timed_out || choice == 0) {
@@ -231,12 +234,47 @@ void rate_driver(int driver_id){
     DriverRating DRs;
     DRs.UserRating(driver_id);
 }
+// I would like to define a function for this error handling that I am copying and pasting again and again
+bool check_valid_input(int choice){
+
+}
 //--------------------------------------GET RIDE DETAILS-----------------------------------------
-void get_ride_details(string & userLocation, string &destination, int &NumStops, vector<string> * stops) {
+void get_ride_details(string & userLocation, string &destination, int &NumStops, vector<string> * stops, vector<string> mapLocations) {
+    int choice;
+    do{
     cout << "Enter your current location: ";
-    getline(cin, userLocation);
+    if (!(cin >> choice)) {
+            cout << "Please Enter valid no corresponding to the location.\n";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue;
+    }
+    cin.ignore();
+    if (choice > 0 && choice <= mapLocations.size()) {
+            userLocation = mapLocations[choice - 1];
+            break;
+        } else {
+            cout << "Invalid choice. Please try again.\n";
+    }
+    }while(1);
+    int choice2;
+    do{
     cout << "Enter your destination: ";
-    getline(cin, destination);
+    if (!(cin >> choice2)) {
+            cout << "Please Enter valid no corresponding to the location.\n";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue;
+    }
+    cin.ignore();
+    if (choice2 > 0 && choice2 <= mapLocations.size()) {
+            userLocation = mapLocations[choice2 - 1];
+            break;
+        } else {
+            cout << "Invalid choice. Please try again.\n";
+    }
+    }while(1);
+
     cout << "\nHow many stops do you want to take? ";
     cin >> NumStops;
     cin.ignore(); // Clear the input buffer for getline

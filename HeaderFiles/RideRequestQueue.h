@@ -4,6 +4,7 @@
 #include<string>
 #include<algorithm>
 #include "Queue.h"
+using namespace std;
 class RideRequestQueue{
     public:
     RideRequestQueue(){}
@@ -46,7 +47,7 @@ class RideRequestQueue{
 
     // Load queue from file
     void loadQueue(Queue& userQueue) {
-        std::ifstream inFile("Files\\userQueue.txt");
+        ifstream inFile("Files\\userQueue.txt");
         if (!inFile.is_open()) {
             cerr << "Unable to open userQueue.txt for reading.\n";
             return;
@@ -64,7 +65,7 @@ class RideRequestQueue{
 
     // Update queue file
     void updateQueueFile(const Queue& userQueue) {
-    std::ofstream outFile("Files\\userQueue.txt", std::ios::trunc);
+    ofstream outFile("Files\\userQueue.txt", ios::trunc);
     if (!outFile.is_open()) {
         cerr << "Unable to open userQueue.txt for writing.\n";
         return;

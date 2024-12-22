@@ -3,7 +3,8 @@
 #include "HeaderFiles\\ManagementSystem.h"
 
 using namespace std;
-
+void get_user_LoginInfo(string & username,string &password);
+void get_driver_LoginInfo(string & username,string &password);
 // Menu Display Function
 void displayMenu() {
     cout << "\n--- Management System Menu ---\n";
@@ -14,6 +15,7 @@ void displayMenu() {
     cout << "5. Exit\n";
     cout << "Enter your choice: ";
 }
+
 int main() {
     ManagementSystem system;
     system.loadData(); // Load existing data from files
@@ -55,19 +57,13 @@ int main() {
             system.saveData(); // Save data after registration
             break;
 
-        case 3: // Login User
-            cout << "Enter username: ";
-            getline(cin,username);
-            cout << "Enter password: ";
-            getline(cin, password);
+        case 3:   // Login User
+            get_user_LoginInfo(username,password);
             system.loginUser(username,password);
             break;
 
         case 4: // Login Driver
-            cout << "Enter username: ";
-            getline(cin,username);
-            cout << "Enter password: ";
-            getline(cin, password);
+            get_driver_LoginInfo(username,password);
             system.loginDriver(username, password);
             break;
 
@@ -82,4 +78,17 @@ int main() {
     } while (choice != 5);
 
     return 0;
+}
+
+void get_user_LoginInfo(string & username,string &password){
+    cout << "Enter username: ";
+    getline(cin,username);
+    cout << "Enter password: ";
+    getline(cin, password);
+}
+void get_driver_LoginInfo(string & username,string &password){
+    cout << "Enter username: ";
+    getline(cin,username);
+    cout << "Enter password: ";
+    getline(cin, password);
 }

@@ -79,9 +79,9 @@ class DriverRating{
         if (ratings.empty()) {
             cout << "No ratings available for Driver ID " << driverID << "." << endl;
         } else {
-            cout << "Ratings for Driver ID " << driverID << ": ";
-            for (int r : ratings) {
-                cout << r << " ";  // Print all ratings for this driver
+            cout << "Your ratings are "<< ": ";
+            for (int i = ratings.size()-1 ; i>=0 && i>=ratings.size()-10;i--) {
+                cout << ratings[i] << " ";  // Print recent 10 ratings
             }
             cout << endl;
 

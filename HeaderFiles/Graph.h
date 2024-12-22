@@ -9,13 +9,16 @@ using namespace std;
 
 class Graph {
 private:
-    map<string, vector<pair<string, int>>> adjList;
+    map<string, map<string, int>> adjList; // {fromNode: {toNode: forwardWeight}}  
 
 public:
-    void addEdge(const string& node1, const string& node2, int weight) {
-        adjList[node1].emplace_back(node2, weight);
-        adjList[node2].emplace_back(node1, weight); // Bidirectional connection
-    }
+    // void addEdge(const string& node1, const string& node2, int weight) {
+    //     adjList[node1].emplace_back(node2, weight);
+    //     adjList[node2].emplace_back(node1, weight); // Bidirectional connection
+    // }
+    void addEdge(const string& node1, const string& node2, int weight) {  
+    adjList[node1][node2] = weight; // Add a directed edge from node1 to node2 with given weight  
+}  
 
     pair<int, vector<string>> calculateShortestPath(const string& start, const string& end) {
         priority_queue<pair<int, string>, vector<pair<int, string>>, greater<>> pq;

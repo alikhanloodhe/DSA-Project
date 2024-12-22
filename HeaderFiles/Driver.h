@@ -84,14 +84,17 @@ class Driver {
     void setLocation(RideRequestMatching& RRM) {
         vector<string> locations = RRM.get_All_Locations(); // Fetch available locations
         cout << "Choose your location from the following options:\n";
-
-        for (size_t i = 0; i < locations.size(); ++i) {
-            cout << i + 1 << ". " << locations[i] << "\n";
-        }
-
+        RRM.print_all_loc();
         cout << "Enter the number corresponding to your location: ";
         int locChoice;
-        cin >> locChoice;
+        // cin >> locChoice;
+        if (!(cin >> locChoice)) {
+            cout << "Invalid input. Please enter a valid choice.\n";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            return;
+        }
+        cin.ignore();
 
         if (locChoice > 0 && locChoice <= locations.size()) {
             location = locations[locChoice - 1];
@@ -135,7 +138,7 @@ class Driver {
         // Clear any existing entries for this driver before saving new availability
         clearAvailability();
 
-        std::ofstream outFile("Files\\driverAvailability.txt", std::ios::app);
+        ofstream outFile("Files\\driverAvailability.txt", ios::app);
         if (outFile.is_open()) {
             outFile << ID << "," << location << "\n";
             outFile.close();
@@ -145,8 +148,8 @@ class Driver {
     }
 
     void clearAvailability() {
-        std::ifstream inFile("Files\\driverAvailability.txt");
-        std::ofstream tempFile("Files\\temp.txt");
+        ifstream inFile("Files\\driverAvailability.txt");
+        ofstream tempFile("Files\\temp.txt");
         if (!inFile.is_open() || !tempFile.is_open()) {
             cerr << "Error handling availability file.\n";
             return;
