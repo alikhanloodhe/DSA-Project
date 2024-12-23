@@ -52,7 +52,7 @@ public:
             return;
         }
         users.add(User(userIDCounter++, username, password, email));
-        cout << "User registered successfully with ID: " << userIDCounter - 1 << ".\n";
+        cout << "Congratulations!! You got registered successfully!!!" << ".\n";
     }
 
     void registerDriver(const string& username, const string& password, const string& license) {
@@ -69,7 +69,7 @@ public:
             return;
         }
         drivers.add(Driver(driverIDCounter++, username, password, license));
-        cout << "Driver registered successfully with ID: " << driverIDCounter - 1 << ".\n";
+        cout << "Congratulations You got registered successfully as a driver!!!." << ".\n";
     }
 // Login user by username:
     void loginUser(const string& username, const string& password) {

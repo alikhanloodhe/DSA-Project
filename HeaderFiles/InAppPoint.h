@@ -174,7 +174,7 @@ public:
         showInAppPoints(id);
         cout << "How many points you want to redeem: " << endl;
         int points;
-        cin >> points;
+        cin>>points;
         redeemPoints(id, points, ridePrice);
     }
     int getCurrentpoints(int id){

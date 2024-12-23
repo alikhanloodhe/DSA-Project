@@ -14,6 +14,7 @@
 #include "InAppPoint.h"
 #include "Time.h"
 #include "DriverRating.h"
+// #include "ErrorHandling.h"
 using namespace std;
 
 class User {
@@ -214,11 +215,11 @@ void book_a_ride(int user_id){
 void in_AppCheckout(int userID,int ride_price){
     InAppPoint AP;
     int currentPoints = AP.getCurrentpoints(userID);
-
+    ErrorHandling ER;
     if(currentPoints>100){
         cout << "Would you like to pay through your In Wallet Points: \n1. Yes \n2. No" << endl;
         int ch;
-        cin >> ch;
+        ch = ER.getValidint(1,2);
     if(ch == 1){
         AP.checkOutUsingPoints(userID,ride_price);
     }
@@ -226,6 +227,7 @@ void in_AppCheckout(int userID,int ride_price){
         return;
     }
     }
+    ER.~ErrorHandling();
 
 }
 
@@ -241,48 +243,33 @@ bool check_valid_input(int choice){
 //--------------------------------------GET RIDE DETAILS-----------------------------------------
 void get_ride_details(string & userLocation, string &destination, int &NumStops, vector<string> * stops, vector<string> mapLocations) {
     int choice;
-    do{
-    cout << "Enter your current location: ";
-    if (!(cin >> choice)) {
-            cout << "Please Enter valid no corresponding to the location.\n";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            continue;
+    ErrorHandling ER;
+    cout<< "------------Starting Location-------------\n";
+    choice = ER.getValidint(1,mapLocations.size());
+    userLocation = mapLocations[choice - 1];
+    cout<<"Starting Location set to "<<userLocation<<"\n";
+    cout << "-----------Destination-------------\n";
+    choice = ER.getValidint(1,mapLocations.size());
+    while(userLocation == mapLocations[choice-1]){
+        cout<<"Starting Location and Destination must be differnt\n";
+        choice = ER.getValidint(1,mapLocations.size());
     }
-    cin.ignore();
-    if (choice > 0 && choice <= mapLocations.size()) {
-            userLocation = mapLocations[choice - 1];
-            break;
-        } else {
-            cout << "Invalid choice. Please try again.\n";
+    destination= mapLocations[choice - 1];
+    cout<<"Destination set to "<<destination<<"\n";
+    cout << "\nHow many stops do you want to take? 0-36\n";
+    NumStops = ER.getValidint(0,mapLocations.size());
+    stops->resize(NumStops); // Resize the vector
+    for (int i = 0; i < NumStops; i++) {
+        cout << "Enter stop " << i + 1 << "\n";
+        int ch;
+        ch = ER.getValidint(1,mapLocations.size());
+        while(userLocation == mapLocations[ch-1] || destination == mapLocations[ch-1]){
+        cout<<"Stop Location must be different than starting and ending location\n";
+        ch = ER.getValidint(1,mapLocations.size());
     }
-    }while(1);
-    int choice2;
-    do{
-    cout << "Enter your destination: ";
-    if (!(cin >> choice2)) {
-            cout << "Please Enter valid no corresponding to the location.\n";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            continue;
+        (*stops)[i] = mapLocations[ch-1]; // Use pointer dereferencing to access the vector
     }
-    cin.ignore();
-    if (choice2 > 0 && choice2 <= mapLocations.size()) {
-            userLocation = mapLocations[choice2 - 1];
-            break;
-        } else {
-            cout << "Invalid choice. Please try again.\n";
-    }
-    }while(1);
-
-    cout << "\nHow many stops do you want to take? ";
-    cin >> NumStops;
-    cin.ignore(); // Clear the input buffer for getline
-   stops->resize(NumStops); // Resize the vector
-    for (int i = 0; i < NumStops; ++i) {
-        cout << "Enter stop " << i + 1 << ": ";
-        getline(cin, (*stops)[i]); // Use pointer dereferencing to access the vector
-    }
+    ER.~ErrorHandling();
 }
 
 // finding id of the driver selected

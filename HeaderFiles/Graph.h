@@ -5,6 +5,8 @@
 #include <queue>
 #include <climits>
 #include <algorithm> // Required for reverse
+#include "ErrorHandling.h"
+
 using namespace std;
 
 class Graph {
@@ -70,9 +72,10 @@ public:
         // Step 1: Find the nearest driver
 
         // In this particular function we will give the user the leverage to select the driver of his own choice
+        ErrorHandling ER;
         int choice_pick;
         cout<<"Would you like to select the driver of your own choice: \n1. Yes \n2. No"<<endl;
-        cin>>choice_pick;
+        choice_pick = ER.getValidint(1,2);
         // show drivers based on 
         vector<string> names;
         string temp_name;
@@ -87,12 +90,12 @@ public:
                 
             }
             for(int i = 0;i<names.size();i++){
-                cout<<i+1<<". "<<names[i]<<" at "<<driverLocations[i]<<" with ratings "<<ratings[i]<<endl;
+                cout<<i+1<<". "<<names[i]<<" at "<<driverLocations[i]<<" with ratings "<<setprecision(2)<<ratings[i]<<endl;
             }
             int choice;
             cout<<"Which driver you want to select!!"<<endl;
-            cin>>choice;
-            cin.ignore();
+            choice = ER.getValidint(1,names.size());
+            ER.~ErrorHandling();
             vector<string> driverToUserPath;
             selected_Driver = driverLocations[choice-1];
             pair<int, vector<string>> result = calculateShortestPath(driverLocations[choice-1], userLocation);

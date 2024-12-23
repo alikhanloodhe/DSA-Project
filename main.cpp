@@ -13,23 +13,20 @@ void displayMenu() {
     cout << "3. Login User\n";
     cout << "4. Login Driver\n";
     cout << "5. Exit\n";
-    cout << "Enter your choice: ";
+    // cout << "Enter your choice: ";
 }
 
 int main() {
     ManagementSystem system;
     system.loadData(); // Load existing data from files
+    cout<<"Welcome to Smart Ride Application";
 
     int choice;
     do {
         displayMenu();
-        if (!(cin >> choice)) {
-            cout << "Invalid input. Please enter a valid choice.\n";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            continue;
-     }
-        cin.ignore(); // Clear the input buffer for getline
+        ErrorHandling ER;
+        choice = ER.getValidint(1,5);
+        ER.~ErrorHandling();
 
         string username, password, email, license;
         int id;

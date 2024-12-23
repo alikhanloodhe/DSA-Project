@@ -5,6 +5,7 @@
 #include <vector>
 #include<algorithm>
 #include "DriverRating.h"
+// #include "ErrorHandling.h"
 
 using namespace std;
 
@@ -46,18 +47,16 @@ class Driver {
         cout << "2. Set Availability\n";
         cout << "3. View Rating\n";
         cout << "4. Exit\n";
-        cout << "Enter your choice: ";
     }
 
     void displayDriverInterface(int id) {
         RideRequestMatching RRM; // Assume this class exists and handles locations.
         int choice;
-
+        cin.ignore();
         while (true) {
             displayMenu();
-            cin >> choice;
-            cin.ignore(); // Clear the input buffer
-
+            ErrorHandling ER;
+            choice = ER.getValidint(1,4);
             switch (choice) {
             case 1:
                 setLocation(RRM);
@@ -87,21 +86,12 @@ class Driver {
         RRM.print_all_loc();
         cout << "Enter the number corresponding to your location: ";
         int locChoice;
-        // cin >> locChoice;
-        if (!(cin >> locChoice)) {
-            cout << "Invalid input. Please enter a valid choice.\n";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            return;
-        }
-        cin.ignore();
-
-        if (locChoice > 0 && locChoice <= locations.size()) {
-            location = locations[locChoice - 1];
-            cout << "Location set to: " << location << "\n";
-        } else {
-            cout << "Invalid choice. Please try again.\n";
-        }
+        ErrorHandling ER;
+        locChoice = ER.getValidint(1,locations.size());
+        location = locations[locChoice - 1];
+        cout<<"Locaiton is set to "<<locations[locChoice-1]<<"\n";
+        ER.~ErrorHandling();
+        
     }
 
     void setAvailability() {
@@ -112,20 +102,18 @@ class Driver {
         cout << "Set Availability\n";
         cout << "1. Available\n";
         cout << "2. Not Available\n";
-        cout << "Enter your choice: ";
         int choice;
-        cin >> choice;
-
+        ErrorHandling ER;
+        choice = ER.getValidint(1,2);
+        ER.~ErrorHandling();
         if (choice == 1) {
             isAvailable = true;
             saveAvailability();
             cout << "Availability set to Available.\n";
-        } else if (choice == 2) {
+        } else {
             isAvailable = false;
             clearAvailability(); // Remove availability from file
             cout << "Availability set to Not Available.\n";
-        } else {
-            cout << "Invalid choice. Please try again.\n";
         }
     }
 
