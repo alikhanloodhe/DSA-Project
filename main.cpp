@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
-#include "HeaderFiles\\ManagementSystem.h"
+#include "HeaderFiles/ManagementSystem.h"
+
 
 using namespace std;
 void get_user_LoginInfo(string & username,string &password);
