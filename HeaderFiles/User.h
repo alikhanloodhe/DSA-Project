@@ -237,9 +237,9 @@ void rate_driver(int driver_id){
     DRs.UserRating(driver_id);
 }
 // I would like to define a function for this error handling that I am copying and pasting again and again
-bool check_valid_input(int choice){
+//bool check_valid_input(int choice){
 
-}
+//}
 //--------------------------------------GET RIDE DETAILS-----------------------------------------
 void get_ride_details(string & userLocation, string &destination, int &NumStops, vector<string> * stops, vector<string> mapLocations) {
     int choice;
