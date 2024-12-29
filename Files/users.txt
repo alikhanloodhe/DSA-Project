@@ -1,8 +1,0 @@
-1,saad,12345,saad@gmail.com
-2,ali,ali,ali
-3,ahmad,1234,ahmad
-4,nauman,12345,nauman@gmail.com
-5,sdf,sdf,asdf
-6,M.Saad,5012,abc@gmail.com
-7,temp,12345,temp@gmail.com
-8,ali2,ali12345,ali@gmail.com

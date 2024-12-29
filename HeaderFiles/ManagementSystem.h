@@ -2,13 +2,13 @@
 #include<string>
 #include "User.h"
 #include "Driver.h"
-#include "LinkedList.h"
+#include "HashTable.h"
 
 using namespace std;
 class ManagementSystem {
 private:
-    LinkedList<User> users;
-    LinkedList<Driver> drivers;
+    HashTable<User> users; // Creating a Hash Table for the user
+    HashTable<Driver> drivers; // Creating a Hash Table for the driver
     int userIDCounter;
     int driverIDCounter;
 
@@ -40,7 +40,7 @@ public:
 
     void registerUser(const string& username, const string& password, const string& email) {
         if (users.usernameExists(username)) {
-            cout << "Username already exists. Please enter a new one.\n";
+            cout << "Username already exists. Please enter your details again.\n";
             string username,email,password;
             cout << "Enter username: ";
             getline(cin, username);
@@ -51,13 +51,18 @@ public:
             registerUser(username,password,email);
             return;
         }
-        users.add(User(userIDCounter++, username, password, email));
+        users.insert(User(userIDCounter++, username, password, email));
         cout << "Congratulations!! You got registered successfully!!!" << ".\n";
+        InAppPoint AP;
+        AP.addPoints(userIDCounter-1,50,true);
+        cout<<"Bonus!!! You got 50 free points on signup!!\n";
+        User* user = users.find(username);
+        user->login(password);
     }
 
     void registerDriver(const string& username, const string& password, const string& license) {
         if (drivers.usernameExists(username)) {
-            cout << "Username already exists. Please enter a new one.\n";
+            cout << "Username already exists. Please enter your details again.\n";
             string username,password,license;
             cout << "Enter username: ";
             getline(cin, username);
@@ -68,10 +73,12 @@ public:
             registerDriver(username,password,license);
             return;
         }
-        drivers.add(Driver(driverIDCounter++, username, password, license));
+        drivers.insert(Driver(driverIDCounter++, username, password, license));
         cout << "Congratulations You got registered successfully as a driver!!!." << ".\n";
+        Driver* driver = drivers.find(username);
+        driver->login(password);
     }
-// Login user by username:
+
     void loginUser(const string& username, const string& password) {
         User* user = users.find(username);
         if (!user) {
@@ -97,6 +104,7 @@ public:
     }
 
     void loadData() {
+        // Loading the data into a hash Tables at the start of the program
         users.loadFromFile("Files\\users.txt");
         drivers.loadFromFile("Files\\drivers.txt");
     }

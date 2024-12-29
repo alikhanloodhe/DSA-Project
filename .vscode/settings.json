@@ -49,6 +49,7 @@
         "future": "cpp",
         "condition_variable": "cpp",
         "map": "cpp",
-        "mutex": "cpp"
+        "mutex": "cpp",
+        "list": "cpp"
     }
 }

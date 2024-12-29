@@ -48,15 +48,16 @@ public:
     }
 
     // Updated displayForward to filter by user ID
-void displayForward(int userId) {
+void displayForward(int userId) { 
     if (!head) {
         cout << "No ride history available.\n";
         return;
     }
-
+    cout<<"Ride History: \n";
     RideNode* current = head;
+    int count = 0;
     bool found = false;
-    while (current) {
+    while (current && count < 10) {
         if (current->id == userId) { // Check if ride belongs to the given user ID
             cout << "Time: " << current->time 
                  << ", Date: " << current->date 
@@ -65,6 +66,7 @@ void displayForward(int userId) {
             found = true;
         }
         current = current->next;
+        count++;
     }
 
     if (!found) {
@@ -78,12 +80,12 @@ void displayBackward(int userId) {
         cout << "No ride history available.\n";
         return;
     }
-
+    cout<<"Ride History: \n";
     RideNode* current = tail;
     bool found = false;
-
+    int count = 0;
     //cout << "Ride History for User ID: " << userId << " (Backward):\n";
-    while (current) {
+    while (current && count<10) {
         if (current->id == userId) { // Check if ride belongs to the given user ID
             //cout << "ID: " << current->id 
             cout << "Time: " << current->time 
@@ -93,6 +95,7 @@ void displayBackward(int userId) {
             found = true;
         }
         current = current->prev;
+        count++;
     }
 
     if (!found) {

@@ -14,7 +14,6 @@
 #include "InAppPoint.h"
 #include "Time.h"
 #include "DriverRating.h"
-// #include "ErrorHandling.h"
 using namespace std;
 
 class User {
@@ -35,13 +34,19 @@ public:
             cout << "User logged in successfully.\n";
             displayUserInterface(ID);
         } else {
+            int attempts = 1;
             cout << "Invalid password.\n";
             string pass;
             cout << "Incorrect, Enter again: ";
-            cin >> pass;
-            while (pass != password) {
+            getline(cin,pass);
+            while (pass != password && attempts<=5) {
                 cout << "Incorrect, Enter again: ";
-                cin >> pass;
+                getline(cin,pass);
+                attempts++;
+            }
+            if(attempts>5){
+                cout<<"You have reached maximum limit. Kindly enter your Login again!!\n";
+                return;
             }
             cout << "User logged in successfully.\n";
             displayUserInterface(ID);
@@ -59,23 +64,17 @@ public:
         cout << "2. Show in Wallet points\n"; 
         cout << "3  Show recent rides\n";
         cout << "4. Exit\n";
-        cout << "Enter your choice: ";
+
     }
-    void displayUserInterface(int id ){ // It would be great if a user object is passed over here
-        
+    void displayUserInterface(int id ){ 
+        ErrorHandling ER;
         int choice;
         do{
         RideHistory RH;
         InAppPoint AP;
         displayMenu();
-        if (!(cin >> choice)) {
-            cout << "Invalid input. Please enter a valid choice.\n";
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            continue;
-        }
+        choice = ER.getValidint(1,4);
         
-        cin.ignore(); // Clear the input buffer for getline
         switch(choice) {
         case 1: 
             book_a_ride(ID);
@@ -85,12 +84,12 @@ public:
             AP.~InAppPoint();
             break;
         case 3: 
-            RH.displayForward(ID);
-            RH.~RideHistory();
+            RH.displayBackward(ID);
             break;
         case 4:
              cout << "Exiting User Interface...\n";
-            // // Save ride history data and in app points data before exiting
+             ER.~ErrorHandling();
+             RH.~RideHistory();
             break;
         default:
             cout << "Invalid choice. Please try again.\n";
@@ -98,25 +97,11 @@ public:
     }
     }while(choice!=4);
 }
-    void deserialize(const string& line) {
-        stringstream ss(line);
-        string idStr;
-         getline(ss, idStr, ',');
-    if (!idStr.empty() && all_of(idStr.begin(), idStr.end(), ::isdigit)) {
-        ID = stoi(idStr); // Safe stoi
-    } else {
-        cerr << "Error: Invalid ID format in input data.\n";
-        ID = -1; // Assign a default or invalid ID
-    }
-        getline(ss, username, ',');
-        getline(ss, password, ',');
-        getline(ss, email);
-    }
-
+    
 //--------------------------------------BOOK A RIDE-----------------------------------------
 void book_a_ride(int user_id){
     RideRequestMatching RRM;
-    RRM.print_all_loc();
+    RRM.print_all_loc(); // printing all locations to the user
     vector<string> maplocations = RRM.get_All_Locations();
     string userLocation, destination;
     int NumStops=0;
@@ -126,12 +111,16 @@ void book_a_ride(int user_id){
     RideRequestQueue RRQ;
     Queue user_queue;
     int choice = 1;
-    vector<int>driver_ids;
-    vector<string>driverLocations;
-    RRQ.loadQueue(user_queue);
-    searchAvailableDrivers(driver_ids,driverLocations);
-    bool flag = false;
-    auto duration = chrono::seconds(15);
+
+    vector<int>driver_ids; // will store driver ids of all available drivers
+    vector<string>driverLocations; // will store locations of all available drivers
+
+    RRQ.loadQueue(user_queue);  // Load Queued users from the file
+
+    searchAvailableDrivers(driver_ids,driverLocations); // search driver availability file and give their locations and ids
+
+    bool flag = false; // a flag that this user will not get the ride
+
     // If no drivers are available or user queue is not empty(some users are waiting in the queue), add user to the queue
     if(driver_ids.size()==0 || !user_queue.isEmpty()){
         RRQ.addToQueue(user_queue,user_id);
@@ -148,8 +137,7 @@ void book_a_ride(int user_id){
         while (true) {
             auto now = chrono::steady_clock::now();
 
-            // Check if 2 minutes have passed
-            if (now - start >= chrono::seconds(30)) {
+            if (now - start >= chrono::seconds(30)) { // A 30 second timer
                 cout << "\nRide Timeout :(\nKindly Book your ride again\n";
                 choice = 0;
                 timed_out = true;
@@ -174,6 +162,7 @@ void book_a_ride(int user_id){
         }
 
         if (timed_out || choice == 0) {
+            cout<<"Ride Cancelled\n";
             break; // Exit loop if timeout occurs or user cancels the ride
         }
 
@@ -187,29 +176,36 @@ void book_a_ride(int user_id){
         }
         else{ break; }
     }
-    if(choice == 0){
+    if(choice == 0){ 
         // If user cancels ride on its own will
         RRQ.removeFromQueue(user_queue,user_id);
         return;
     }
-    // Removing the user from the quue
-    RRQ.removeFromQueue(user_queue,user_id);
+    
+    RRQ.removeFromQueue(user_queue,user_id);  // Removing the user from the quue 
     string selected_driver;
-    // Passing the user location, destination, driver locations, selected driver, number of stops and stops to handle ride function 
-    RRM.hanldeRide(userLocation, destination,driver_ids, driverLocations,selected_driver,NumStops,stops); // This particular function will be modified here to handle ride
+    // Passing the user location, destination, driver locations, selected driver, number of stops and stops to handle ride function
+    bool is_ride_accepted;
+    Graph nustMap = RRM.getNustMap(); 
+    is_ride_accepted = nustMap.handleRide(user_id,userLocation, destination,driver_ids, driverLocations,selected_driver,NumStops,stops); // This particular function will be modified here to handle ride
+    if(is_ride_accepted){
+        int current_id = find_Driver_Id(driver_ids,driverLocations,selected_driver); // Now we will have to find the id of nearest driver
+        clearAvail_curr_driver(current_id); // Clear the availability of the driver selected
     
-    int current_id = find_Driver_Id(driver_ids,driverLocations,selected_driver); // Now we will have to find the id of nearest driver
-    clearAvail_curr_driver(current_id); // Clear the availability of the driver selected
+        Time t;
+        DynamicRidePrice DRP;
+        string time = t.get_current_time();
+        t.~Time();
+        int ride_price = DRP.getdynamicRidePrice(nustMap.get_total_Distance_with_Stops(), time, driver_ids.size(),stops);
+        cout<<"The price of the ride is: "<<ride_price<<endl;
+        rate_driver(current_id);
+        SaveRideHistory(userLocation, destination);   // Add the ride to Ride History
+        in_AppCheckout(user_id,ride_price);
+    }
+    else{
+        cout<<"The driver seems to be busy. Please Book another one.\n";
+    }
     
-    Time t;
-    DynamicRidePrice DRP;
-    string time = t.get_current_time();
-    t.~Time();
-    int ride_price = DRP.getdynamicRidePrice(userLocation, destination, time, driver_ids.size(),stops);
-    cout<<"The price of the ride is: "<<ride_price<<endl;
-    rate_driver(current_id);
-    SaveRideHistory(userLocation, destination);   // Add the ride to Ride History
-    in_AppCheckout(user_id,ride_price);
 }
 
 void in_AppCheckout(int userID,int ride_price){
@@ -236,10 +232,7 @@ void rate_driver(int driver_id){
     DriverRating DRs;
     DRs.UserRating(driver_id);
 }
-// I would like to define a function for this error handling that I am copying and pasting again and again
-bool check_valid_input(int choice){
 
-}
 //--------------------------------------GET RIDE DETAILS-----------------------------------------
 void get_ride_details(string & userLocation, string &destination, int &NumStops, vector<string> * stops, vector<string> mapLocations) {
     int choice;
@@ -248,7 +241,7 @@ void get_ride_details(string & userLocation, string &destination, int &NumStops,
     choice = ER.getValidint(1,mapLocations.size());
     userLocation = mapLocations[choice - 1];
     cout<<"Starting Location set to "<<userLocation<<"\n";
-    cout << "-----------Destination-------------\n";
+    cout << "------------Destination-------------\n";
     choice = ER.getValidint(1,mapLocations.size());
     while(userLocation == mapLocations[choice-1]){
         cout<<"Starting Location and Destination must be differnt\n";
@@ -320,13 +313,13 @@ void SaveRideHistory(string userLocation,string destination){
     RH.addRide(ID, time, date, userLocation, destination);
     RH.saveToFile("Files\\RideHistory.txt");
     InAppPoint points;
-    points.addPoints(ID,5);
+    points.addPoints(ID,5,false);
     points.~InAppPoint();
     RH.~RideHistory();
 }
 
 static void searchAvailableDrivers(vector<int>& ids, vector<string>& locations) {
-        std::ifstream inFile("Files\\driverAvailability.txt");
+        ifstream inFile("Files\\driverAvailability.txt");
         if (!inFile.is_open()) {
             cerr << "Error opening driver availability file.\n";
             return;
@@ -347,5 +340,19 @@ static void searchAvailableDrivers(vector<int>& ids, vector<string>& locations) 
 
         inFile.close();
 }
+    void deserialize(const string& line) {
+        stringstream ss(line);
+        string idStr;
+         getline(ss, idStr, ',');
+    if (!idStr.empty() && all_of(idStr.begin(), idStr.end(), ::isdigit)) {
+        ID = stoi(idStr); // Safe stoi
+    } else {
+        cerr << "Error: Invalid ID format in input data.\n";
+        ID = -1; // Assign a default or invalid ID
+    }
+        getline(ss, username, ',');
+        getline(ss, password, ',');
+        getline(ss, email);
+    }
 };
 #endif

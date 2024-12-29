@@ -6,27 +6,6 @@ class ErrorHandling{
     public:
     ErrorHandling(){}
     ~ErrorHandling(){}
-    
-    // int getValidint(int start_limit,int end_limit){
-    //     int choice;
-    //     do{
-    //     cout<<"Enter your choice: ";
-    //     if(!(cin>>choice)){
-    //         cout << "Invalid input. Please enter a valid choice.\n";
-    //         cin.clear();
-    //         cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    //         continue;
-    //     }
-    //     else if(choice>=start_limit && choice <=end_limit){
-    //         cin.ignore();
-    //         return choice;
-    //     }
-    //     else{
-    //         cout<<"Invalid input. Please enter a valid choice\n";
-    //         // continue;
-    //     }
-    //     }while(1);
-    // }
     int getValidint(int start_limit, int end_limit) {
     int choice;
     string input;
@@ -48,11 +27,16 @@ class ErrorHandling{
             if (choice >= start_limit && choice <= end_limit) {
                 return choice; // Valid input
             } else {
-                cout << "Invalid input. Please enter a number between " 
-                     << start_limit << " and " << end_limit << ".\n";
+                if(start_limit == end_limit){
+                    cout<<"Please enter only valid response\n";
+                }
+                else{
+                    cout << "Invalid input. Please enter a number between " << start_limit << " and " << end_limit << ".\n";
+                }
+                
             }
         } catch (const invalid_argument&) {
-            cout << "Invalid input. Please enter a valid integer.\n";
+            cout << "Invalid input. Please enter a valid integer in betwenn "<<start_limit<< " and " <<end_limit<<"\n";
         } catch (const out_of_range&) {
             cout << "Input is out of range. Please enter a valid integer.\n";
         }

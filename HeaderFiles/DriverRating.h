@@ -39,21 +39,20 @@ class DriverRating{
 
         // Clear the buffer to remove any leftover newline character
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-        // Store the rating in DriverRating.txt
+        saveRating(driverID,rating);
+        cout << "Thank you for rating the ride!\n"; // Confirmation message
+    }
+    void saveRating(int ID, int Rating){
         ofstream ratingFile("Files\\DriverRating.txt", ios::app);
         if (ratingFile.is_open()) {
-            ratingFile << driverID << ":" << rating << endl; // Append rating to file
+            ratingFile << ID << ":" << Rating << endl; // Append rating to file
             ratingFile.close();
         } else {
             cerr << "Error: Could not open DriverRating.txt for writing." << endl;
             return;
         }
-
-        cout << "Thank you for rating the ride!\n"; // Confirmation message
     }
-
-
+    
     
     void ShowDriverRating(int driverID) {
         ifstream ratingFile("Files\\DriverRating.txt");
@@ -79,7 +78,7 @@ class DriverRating{
         if (ratings.empty()) {
             cout << "No ratings available for Driver ID " << driverID << "." << endl;
         } else {
-            cout << "Your ratings are "<< ": ";
+            cout << "Your previous ratings are  "<< ": ";
             for (int i = ratings.size()-1 ; i>=0 && i>=ratings.size()-10;i--) {
                 cout << ratings[i] << " ";  // Print recent 10 ratings
             }
@@ -92,6 +91,7 @@ class DriverRating{
             avgRating /= ratings.size();
             
             cout << "Average Rating: " <<setprecision(2)<< avgRating << endl;
+            cout<<"Have a nice behaviour :) with the user to boost your ratings!!!\n";
         }
     }
 

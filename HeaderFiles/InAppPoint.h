@@ -105,12 +105,12 @@ public:
     }
 
     // Add points to a specific user
-    void addPoints(int userID, int pointsToAdd) {
+    // Add a flag to forcefully add points
+    void addPoints(int userID, int pointsToAdd,bool flag) {
         RideHistory rh;
         int rideCount = rh.getRidesCountForToday(userID);
 
-        if (rideCount <= 1) {
-            //cout << "User ID " << userID << " has not completed enough rides today to earn points." << endl;
+        if (rideCount <= 1 && !flag) {
             return;
         }
 
@@ -162,7 +162,7 @@ public:
                     pointsAvailable -= pointsToRedeem;
                     int remainingAmount = ridePrice - pointsToRedeem;
                     updatePointsInFile(userID, pointsAvailable);
-                    cout << "Points used: " << pointsAvailable << ". Remaining to pay: " << remainingAmount << endl;
+                    cout << "Points used: " << pointsToRedeem << ". Remaining to pay: " << remainingAmount << endl;
                 }
                 return;
             }
@@ -172,9 +172,20 @@ public:
     }
     void checkOutUsingPoints(int id,int ridePrice){
         showInAppPoints(id);
-        cout << "How many points you want to redeem: " << endl;
         int points;
-        cin>>points;
+        while (true) {
+        cout << "How many points you want to redeem: ";
+        cin >> points;
+
+        // Check if the input is valid and a positive integer
+        if (cin.fail() || points <= 0) {
+            cout << "Invalid input!! Please enter only valid integer.\n";
+            cin.clear(); // Clear the error flag
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Discard invalid input
+        } else {
+            break; // Input is valid
+        }
+    }
         redeemPoints(id, points, ridePrice);
     }
     int getCurrentpoints(int id){

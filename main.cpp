@@ -5,6 +5,8 @@
 using namespace std;
 void get_user_LoginInfo(string & username,string &password);
 void get_driver_LoginInfo(string & username,string &password);
+void get_user_registerInfo(string & username,string& email, string &password);
+void get_driver_registerInfo(string & username,string& password, string &license);
 // Menu Display Function
 void displayMenu() {
     cout << "\n--- Management System Menu ---\n";
@@ -13,7 +15,6 @@ void displayMenu() {
     cout << "3. Login User\n";
     cout << "4. Login Driver\n";
     cout << "5. Exit\n";
-    // cout << "Enter your choice: ";
 }
 
 int main() {
@@ -33,23 +34,13 @@ int main() {
 
         switch (choice) {
         case 1: // Register User
-            cout << "Enter username: ";
-            getline(cin, username);
-            cout << "Enter email: ";
-            getline(cin, email);
-            cout << "Enter password: ";
-            getline(cin, password);
+            get_user_registerInfo(username,email,password);
             system.registerUser(username, password, email);
             system.saveData(); // Save data after registration
             break;
 
         case 2: // Register Driver
-            cout << "Enter username: ";
-            getline(cin, username);
-            cout << "Enter password: ";
-            getline(cin, password);
-            cout << "Enter license number: ";
-            getline(cin, license);
+            get_driver_registerInfo(username,email,license);
             system.registerDriver(username, password, license);
             system.saveData(); // Save data after registration
             break;
@@ -76,14 +67,34 @@ int main() {
 
     return 0;
 }
-
+void get_user_registerInfo(string & username,string& email, string &password){
+    cout<<"----------User Register Page----------\n";
+    cout << "Enter username: ";
+    getline(cin,username);
+    cout << "Enter email: ";
+    getline(cin, email);
+    cout << "Enter password: ";
+    getline(cin, password);
+}
+void get_driver_registerInfo(string & username,string& password, string &license){
+    cout<<"----------Driver Register Page----------\n";
+    cout << "Enter username: ";
+    getline(cin,username);
+    cout << "Enter password: ";
+    getline(cin, password);
+    cout << "Enter license number: ";
+    getline(cin, license);
+    
+}
 void get_user_LoginInfo(string & username,string &password){
+    cout<<"----------User Login Page----------\n";
     cout << "Enter username: ";
     getline(cin,username);
     cout << "Enter password: ";
     getline(cin, password);
 }
 void get_driver_LoginInfo(string & username,string &password){
+    cout<<"----------Driver Login Page----------\n";
     cout << "Enter username: ";
     getline(cin,username);
     cout << "Enter password: ";
