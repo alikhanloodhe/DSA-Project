@@ -40,7 +40,7 @@ int main() {
             break;
 
         case 2: // Register Driver
-            get_driver_registerInfo(username,email,license);
+            get_driver_registerInfo(username,password,license);
             system.registerDriver(username, password, license);
             system.saveData(); // Save data after registration
             break;

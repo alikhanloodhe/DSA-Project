@@ -104,7 +104,7 @@ public:
             choice = ER.getValidint(1,names.size());
             ER.~ErrorHandling();
             // Here we will implement that waiting for the driver to accept the ride!!!
-            send_request(user_id, choice,userLocation,destination,stops);
+            send_request(user_id, driver_ids[choice-1],userLocation,destination,stops);
             if(check_acceptance()){
                 cout<<"Ride accepted\n";
                 clear_acceptance();

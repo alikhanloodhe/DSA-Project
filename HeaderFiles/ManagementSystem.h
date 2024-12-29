@@ -56,8 +56,6 @@ public:
         InAppPoint AP;
         AP.addPoints(userIDCounter-1,50,true);
         cout<<"Bonus!!! You got 50 free points on signup!!\n";
-        User* user = users.find(username);
-        user->login(password);
     }
 
     void registerDriver(const string& username, const string& password, const string& license) {
@@ -75,8 +73,6 @@ public:
         }
         drivers.insert(Driver(driverIDCounter++, username, password, license));
         cout << "Congratulations You got registered successfully as a driver!!!." << ".\n";
-        Driver* driver = drivers.find(username);
-        driver->login(password);
     }
 
     void loginUser(const string& username, const string& password) {
