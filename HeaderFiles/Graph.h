@@ -11,9 +11,7 @@
 using namespace std;
 
 class Graph {
-    // vector<string> all_driver_names;
     unordered_map<int, string> driver_data;
-    // vector<string> all_user_names;
     unordered_map<int, string> user_data;
 private:
     map<string, map<string, int>> adjList;  

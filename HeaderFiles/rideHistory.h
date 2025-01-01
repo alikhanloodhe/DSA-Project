@@ -200,6 +200,7 @@ string getCurrentDate() {
             current = current->next;
             delete temp;
         }
+        return ;
         //cout << "Ride history cleared.\n";
     }
 };

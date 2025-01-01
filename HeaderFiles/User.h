@@ -89,7 +89,6 @@ public:
         case 4:
              cout << "Exiting User Interface...\n";
              ER.~ErrorHandling();
-             RH.~RideHistory();
             break;
         default:
             cout << "Invalid choice. Please try again.\n";

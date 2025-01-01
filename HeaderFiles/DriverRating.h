@@ -79,10 +79,19 @@ class DriverRating{
             cout << "No ratings available for Driver ID " << driverID << "." << endl;
         } else {
             cout << "Your previous ratings are  "<< ": ";
-            for (int i = ratings.size()-1 ; i>=0 && i>=ratings.size()-10;i--) {
+            if(ratings.size()>10){
+                for (int i = ratings.size()-1 ; i>=0 && i>=ratings.size()-10;i--) {
                 cout << ratings[i] << " ";  // Print recent 10 ratings
             }
             cout << endl;
+            }
+            else{
+                for (int i = ratings.size()-1 ; i>=0; i--) {
+                cout << ratings[i] << " ";  // Print recent 10 ratings
+            }
+            cout << endl;
+            }
+            
 
             double avgRating = 0;
             for (int r : ratings) {
